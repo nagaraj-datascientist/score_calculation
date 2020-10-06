@@ -1,0 +1,76 @@
+{
+    "personal_info": {
+        "file_name": "emp_score_dev_employee_personal_info.parquet",
+        "details": "Personal details",
+        "rel_cols": [
+            "emp_id",
+            "current_emp_name",
+            "current_emp_title",
+            "job_end_date",
+            "job_start_date",
+            "job_title",
+            "updated_time",
+            "recalculate_score_eligible"
+        ]
+    },
+    "work_info": {
+        "file_name": "emp_score_dev_employee_work_info.parquet",
+        "details": "Work info",
+        "rel_cols": [
+            "work_exp_id",
+            "emp_id",
+            "company_name",
+            "domain",
+            "employeement_type",
+            "end_date",
+            "is_currently",
+            "location",
+            "skills_used",
+            "start_date",
+            "title",
+            "updated_time"
+        ]
+    },
+    "employee_technology_stack": {
+        "file_name": "emp_score_dev_employee_technology_stack_v1.parquet",
+        "details": "Employee technology details",
+        "rel_cols": [
+            "technology_id",
+            "technology_description",
+            "emp_id",
+            "experience",
+            "status",
+            "technology_scale",
+            "updated_time"
+        ]
+    },
+    "certificate_info": {
+        "file_name": "emp_score_dev_employee_certificate_info.parquet",
+        "details": "Certificate info",
+        "rel_cols": [
+            "certificate_id",
+            "emp_id",
+            "certificate_company_name",
+            "certificate_completion_date",
+            "certificate_level_desc",
+            "certificate_level_id",
+            "certificate_name",
+            "updated_time"
+        ]
+    },
+    "education_info": {
+        "file_name": "emp_score_dev_employee_education_info.parquet",
+        "details": "Eduction details"
+    },
+    "interview_schedule": {
+        "file_name": "emp_score_dev_interview_schedule.parquet",
+        "details": "Interview details",
+        "rel_cols": [
+            "int_id",
+            "comp_id",
+            "emp_id",
+            "int_status_desc",
+            "int_date"
+        ]
+    }
+}

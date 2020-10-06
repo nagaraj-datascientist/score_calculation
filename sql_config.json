@@ -1,0 +1,13 @@
+{
+    "TABLES_LIST": [
+        "employee_personal_info",
+        "employee_technology_stack_v1",
+        "interview_schedule",
+        "employee_work_info",
+        "employee_req_referral_info",
+        "employee_education_info",
+        "employee_certificate_info",
+        "employee_direct_interview",
+        "employee_phone_interview"
+    ]
+}
