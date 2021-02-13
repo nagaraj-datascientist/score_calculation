@@ -1,4 +1,6 @@
 {
+    "ALL_TABLES_QUERY": "SELECT * FROM system_schema.tables WHERE keyspace_name =",
+    "INDIVIDUAL_TABLE_DATA_QUERY": "SELECT * FROM",
     "TABLES_LIST": [
         "employee_personal_info",
         "employee_technology_stack_v1",
@@ -8,6 +10,14 @@
         "employee_education_info",
         "employee_certificate_info",
         "employee_direct_interview",
-        "employee_phone_interview"
-    ]
+        "employee_phone_interview",
+        "employee_offer_info",
+        "employee_office_reporting",
+        "static_score_meta"
+    ],
+    "SCORE_DETAILS_INSERT_QUERY": "INSERT INTO score_detail_info (emp_id, proficiency_score_id, varaiable_score_id, certification_point, certification_population_point, created_by, created_time, domain_point, domain_population_point, education_point, experience_point, experience_population_point, interview_point, job_longevity_point, niche_skill_point, noofoffers_point, prscore, referrals_point, reporting_point, skillset_population_point, special_rating_point, status, vrscore) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+    "SCORE_DETAILS_UPDATE_QUERY": "INSERT INTO score_detail_info (emp_id, proficiency_score_id, varaiable_score_id, certification_point, certification_population_point, updated_by, updated_time, domain_point, domain_population_point, education_point, experience_point, experience_population_point, interview_point, job_longevity_point, niche_skill_point, noofoffers_point, prscore, referrals_point, reporting_point, skillset_population_point, special_rating_point, status, vrscore) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+    "SCORE_DETAILS_SELECT_QUERY": "SELECT * FROM score_detail_info",
+    "PERSONAL_INFO_RECALCULATE_UPDATE_QUERY": "UPDATE employee_personal_info SET recalculate_score_eligible = 'N' WHERE emp_id = ",
+    "SCORE_HISTORY_DETAILS_INSERT_QUERY": "INSERT INTO score_history_detail_info (id, emp_id, proficiency_score_id, varaiable_score_id, certification_point, certification_population_point, created_by, created_time, domain_point, domain_population_point, education_point, experience_point, experience_population_point, interview_point, job_longevity_point, niche_skill_point, noofoffers_point, prscore, referrals_point, reporting_point, skillset_population_point, special_rating_point, status, vrscore) VALUES(uuid(),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 }

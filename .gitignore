@@ -1,0 +1,10 @@
+
+# Folders
+venv
+log
+data
+score
+__pycache__
+
+# Files
+cassandra_config.ini

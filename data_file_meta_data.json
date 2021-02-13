@@ -72,5 +72,80 @@
             "int_status_desc",
             "int_date"
         ]
-    }
+    },
+    "offer_info": {
+        "file_name": "emp_score_dev_employee_offer_info.parquet",
+        "details": "Offer details",
+        "rel_cols": [
+            "offer_id",
+            "emp_id",
+            "offer_status_description",
+            "reason",
+            "status"
+        ]
+    },
+    "static_score_meta": {
+        "file_name": "emp_score_dev_static_score_meta.parquet",
+        "details": "Static score meta details"
+    },
+    "referral_info": {
+        "file_name": "emp_score_dev_employee_req_referral_info.parquet",
+        "details": "Referral details",
+        "rel_cols": [
+            "referral_req_id",
+            "emp_id",
+            "proj_end_date",
+            "proj_start_date",
+            "referral_req_company_id",
+            "referral_req_company_name",
+            "referral_req_description",
+            "referral_req_project_name",
+            "status",
+            "title"
+        ]
+    },
+    "reporting_info": {
+        "file_name": "emp_score_dev_employee_office_reporting.parquet",
+        "details": "Reporting details",
+        "rel_cols": [
+            "office_repo_id",
+            "emp_id",
+            "office_repo_company_name",
+            "office_repo_date",
+            "office_repo_description",
+            "status"
+        ]
+    },
+    "score_output_file_format": "parquet",
+    "ps_skill_set_file": "PS_Skill_Set_Score",
+    "ps_reliability_file": "PS_Reliability_Score",
+    "ps_interview_file": "PS_Interview_Score",
+    "ps_education_file": "PS_Education_Score",
+    "ps_domain_file": "PS_Domain_Score",
+    "ps_certificate_file": "PS_Certificate_Score",
+    "ps_reporting_file": "PS_Reporting_Score",
+    "ps_referral_file": "PS_Referral_Score",
+    "ps_offer_file": "PS_Offer_Score",
+    "ps_exp_year_file": "PS_Exp_Year_Score",
+    "ms_total_exp_file": "MS_Total_Experience_With_Population_Score",
+    "ms_skill_set_file": "MS_Skillset_With_Population_Score",
+    "ms_domain_file": "MS_Domain_With_Population_Score",
+    "ms_certificate_file": "MS_Certificate_Trend_Score",
+    "score_data_rel_cols": [
+        "emp_id",
+        "cert_score",
+        "ms_cert_score",
+        "domain_score",
+        "ms_domain_score",
+        "education_score",
+        "interview_score",
+        "rel_score2",
+        "skill_set_score",
+        "ms_skill_set_score",
+        "total_exp_ratio",
+        "reporting_score",
+        "referral_score",
+        "no_of_offers_score",
+        "exp_year_score"
+    ]
 }

@@ -6,27 +6,44 @@ Details:
 '''
 
 import configparser
+import json
 import logging.config
 import os
 import sys
 
-import cassandra_connection as cc
+from cassandra_connection import CassandraCluster
 
-# Configurations
+# Reading Cassandra Configurations
 c_cfg = configparser.ConfigParser()
 c_cfg.read('cassandra_config.ini')
 
-s_cfg = configparser.ConfigParser()
-s_cfg.read('sql_config.ini')
+# Reading sql configuration
+with open('sql_config.json') as f:
+    s_cfg = json.load(f)
 
-# Creates log and data folder
-if not os.path.exists(c_cfg.get('FOLDER_DETAILS', 'LOG_FOLDER')):
-    os.makedirs(c_cfg.get('FOLDER_DETAILS', 'LOG_FOLDER'))
+all_tables_query = s_cfg.get('ALL_TABLES_QUERY')
+individual_table_data_query = s_cfg.get('INDIVIDUAL_TABLE_DATA_QUERY')
+all_tables_query = f'''{all_tables_query} '{keyspace}' '''
 
-if not os.path.exists(c_cfg.get('FOLDER_DETAILS', 'DATA_FOLDER')):
-    os.makedirs(c_cfg.get('FOLDER_DETAILS', 'DATA_FOLDER'))
+# Cassandra config details
+ip_address = c_cfg.get('CASSANDRA_SERVER_DETAILS', 'IP_ADDRESS')
+port = c_cfg.getint('CASSANDRA_SERVER_DETAILS', 'PORT')
+user = c_cfg.get('CASSANDRA_SERVER_DETAILS', 'USER')
+password = c_cfg.get('CASSANDRA_SERVER_DETAILS', 'PWD')
+keyspace = c_cfg.get('CASSANDRA_SERVER_DETAILS', 'KEY_SPACE')
 
-# Initialize log
+# Data and log folders
+data_folder = c_cfg.get('FOLDER_DETAILS', 'DATA_FOLDER')
+log_folder = c_cfg.get('FOLDER_DETAILS', 'LOG_FOLDER')
+
+# Creating data and log folders
+if not os.path.exists(data_folder):
+    os.makedirs(data_folder)
+
+if not os.path.exists(log_folder):
+    os.makedirs(log_folder)
+
+# Log details
 logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
 
@@ -35,55 +52,33 @@ def main():
     '''Makes cassandra connection and pulls all table data in parquet file.'''
 
     logger.info('started.')
-
-    all_tables_query = f'''{
-        s_cfg.get('SYSTEM', 'ALL_TABLES_QUERY')} '{
-            c_cfg.get('CASSANDRA_SERVER_DETAILS', 'KEY_SPACE')}' '''
-
     logger.debug(f'Query to get all the tables - {all_tables_query}')
-    cas_con = cc.CassandraCluster(
-        c_cfg.get('CASSANDRA_SERVER_DETAILS', 'IP_ADDRESS'),
-        c_cfg.getint('CASSANDRA_SERVER_DETAILS', 'PORT'),
-        c_cfg.get('CASSANDRA_SERVER_DETAILS', 'USER'),
-        c_cfg.get('CASSANDRA_SERVER_DETAILS', 'PWD'),)
 
-    cluster, session = cas_con.cassandra_session()
-    logger.info('Cassandra connection is established.')
+    cc = CassandraCluster(ip_address, port, user, password)
 
-    # Get all tables from the key space
-    all_tables_df = cas_con.pandas_result_set(session, c_cfg.get(
-        'CASSANDRA_SERVER_DETAILS', 'KEY_SPACE'), all_tables_query)
+    with cc.connect_cassandra(keyspace) as cas_con:
 
-    all_tables = all_tables_df['table_name'].tolist()
-    all_tables_df.to_csv(
-        f'''{
-            c_cfg.get('FOLDER_DETAILS', 'DATA_FOLDER')}/{
-                c_cfg.get('CASSANDRA_SERVER_DETAILS', 'KEY_SPACE')
-                }_all_tables.csv''', index=False)
+        all_tables_df = cas_con.query_result_set_to_pandas(cas_con.session,
+                                                           all_tables_query)
 
-    logger.info('Data pull is processing...')
+        file_location = f'{data_folder}/{keyspace}_all_tables'
+        cas_con.query_result_set_to_file(session=cas_con.session,
+                                         query=all_tables_query,
+                                         file_location=file_location,
+                                         file_type='csv')
 
-    # Write all table data into parquet file
-    for table in all_tables:
-        table_data_query = s_cfg.get('DATA', 'TABLES_DATA_QUERY') + ' ' + table
-        logger.debug(f'table data query - {table_data_query}')
-        table_data_df = cas_con.pandas_result_set(
-            session, c_cfg.get('CASSANDRA_SERVER_DETAILS', 'KEY_SPACE'),
-            table_data_query)
+        all_tables = all_tables_df['table_name'].tolist()
+        logger.info('Data pull is started...')
 
-        table_data_df.to_parquet(
-            f'''{
-                c_cfg.get('FOLDER_DETAILS', 'DATA_FOLDER')}/{
-                    c_cfg.get('CASSANDRA_SERVER_DETAILS', 'KEY_SPACE')
-                    }_{table}.parquet''', index=False)
+        for table in all_tables:
+            table_data_query = f'{individual_table_data_query} {table}'
+            logger.debug(f'table data query - {table_data_query}')
+            file_location = f'{data_folder}/{keyspace}_{table}'
 
-        # table_data_df.to_csv(
-        #     f'''{
-        #         c_cfg.get('FOLDER_DETAILS', 'DATA_FOLDER')}/{
-        #             c_cfg.get('CASSANDRA_SERVER_DETAILS', 'KEY_SPACE')
-        #             }_{t}.csv''', index=False)
-
-    cas_con.cluster_shutdown(cluster)
+            cas_con.query_result_set_to_file(session=cas_con.session,
+                                             query=table_data_query,
+                                             file_location=file_location,
+                                             file_type='csv')
 
 
 if __name__ == '__main__':

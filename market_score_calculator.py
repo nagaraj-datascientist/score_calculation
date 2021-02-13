@@ -9,7 +9,8 @@ import pandas as pd
 class MarketScoreCalculator:
 
     '''MarketScoreCalculator class defines all the market score functions
-        Functions:
+        Methods
+        -------
             total_exp_with_population
             domain_with_population
             skill_set_with_population

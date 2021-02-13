@@ -9,7 +9,8 @@ import pandas as pd
 
 class PersonalScoreCalculator:
     '''PersonalScoreCalculator class defines all the personal scroe functions
-        Functions:
+        Methods
+        ------
             education_score
             valid_certificate_score
             domain_score
@@ -18,37 +19,66 @@ class PersonalScoreCalculator:
             interview_score
     '''
 
-    EDUCATION_SCORE = {
-        'education_type_desc': ['Postgraduate/Master of Engineering', 'Phd',
-                                'Undergraduate/Bachelor of Engineering', 'High School'],
-        'education_score': [75, 90, 50, 25]}
-
     INTERVIEW_STATUS = ['Selected', 'Rejected']
 
     def __init__(self):
         self.logger = logging.getLogger(__name__)
 
-    def education_score(self, employee_edu_df, education_score=EDUCATION_SCORE):
-        '''Calculates education score
+    def education_type_score(self, employee_edu_df, static_score_meta_df):
+        '''Calculates Eduction type score
 
         Args:
             employee_edu_df (dataframe): Person employee details dataframe
-
-            education_score (dict, optional): Education score for every grade.
-                                    Defaults to class variable EDUCATION_SCORE.
+            static_score_meta_df (dataframe): Static score meta table dataframe
 
         Returns:
-            pandas dataframe: Education score based on the grade.
+            pandas dataframe: Education type score based on the static score meta
         '''
 
-        self.logger.debug(f'Education grade static score - {education_score}')
-        edu_static_score_df = pd.DataFrame.from_dict(education_score)
+        edu_static_score_df = static_score_meta_df[static_score_meta_df['score_name']
+                                                   == 'education_type']
+
+        edu_static_score_df = edu_static_score_df.rename(
+            columns={"score": "education_score"})
+
+        edu_static_score_df = edu_static_score_df.astype(
+            {"education_score": 'int'})
 
         edu_score_df = pd.merge(
-            employee_edu_df, edu_static_score_df, on='education_type_desc',
-            how='left')
+            employee_edu_df, edu_static_score_df,
+            left_on='education_type_desc', right_on='category', how='left')
 
         return edu_score_df
+
+    def exp_year_score(self, exp_agg_df, static_score_meta_df):
+        '''Calculates Experience score
+
+        Args:
+            exp_agg_df (dataframe): person with total experience aggregated data
+            static_score_meta_df (dataframe): Static score meta table dataframe
+
+        Returns:
+            pandas dataframe: Total Exp year score based on the static score meta
+        '''
+        exp_static_score_df = static_score_meta_df[static_score_meta_df['score_name']
+                                                   == 'experience_year']
+        exp_static_score_df = exp_static_score_df.astype({"range_start": 'int',
+                                                          "range_end": 'int'})
+
+        exp_agg_df = exp_agg_df[['emp_id', 'total_exp']]
+
+        exp_ranges = []
+        for _, row in exp_static_score_df.iterrows():
+            exp = pd.DataFrame(
+                range(row['range_start'], row['range_end']+1), columns=['exp_year'])
+            exp['exp_year_score'] = int(row['score'])
+            exp_ranges.append(exp)
+
+        exp_static_score_details_df = pd.concat(exp_ranges)
+
+        exp_score_df = pd.merge(exp_agg_df, exp_static_score_details_df,
+                                how='left', left_on='total_exp', right_on='exp_year')
+        return exp_score_df
 
     def valid_certificate_score(self, certificate_df, valid_years=5):
         '''Calculates certificate score for valid one
@@ -166,3 +196,54 @@ class PersonalScoreCalculator:
             interview_score=('interview_score', 'sum')).reset_index())
 
         return interview_score_df
+
+    def no_of_offer_score(self, person_offer_agg_df):
+        '''Calculates No of offers score for the person with no of offers aggregated data
+
+        Args:
+            person_offer_agg_df (dataframe): person with no of offers aggregated data
+
+        Returns:
+            dataframe: offer score for the person with no of offers agg. data
+        '''
+
+        offer_score_df = person_offer_agg_df.copy()
+
+        offer_score_df.loc[:, 'no_of_offers_score'] = (
+            person_offer_agg_df['no_of_offers'] * 10)
+
+        return offer_score_df
+
+    def referral_score(self, person_referral_agg_df):
+        '''Calculates No of referral score for the person with no of referral aggregated data
+
+        Args:
+            person_referral_agg_df (dataframe): person with no of referral aggregated data
+
+        Returns:
+            dataframe: offer score for the person with no of referral agg. data
+        '''
+
+        referral_score_df = person_referral_agg_df.copy()
+
+        referral_score_df.loc[:, 'referral_score'] = (
+            person_referral_agg_df['no_of_referral'] * 10)
+
+        return referral_score_df
+
+    def reporting_score(self, person_reporting_agg_df):
+        '''Calculates No of reporting score for the person with no of reporting aggregated data
+
+        Args:
+            person_reporting_agg_df (dataframe): person with no of reporting aggregated data
+
+        Returns:
+            dataframe: offer score for the person with no of reporting agg. data
+        '''
+
+        reporting_score_df = person_reporting_agg_df.copy()
+
+        reporting_score_df.loc[:, 'reporting_score'] = (
+            person_reporting_agg_df['no_of_reporting'] * 10)
+
+        return reporting_score_df
