@@ -145,7 +145,7 @@ class PersonalScoreCalculator:
 
         return tech_count_df
 
-    def reliablity_score(self, work_agg_df):
+    def reliability_score(self, work_agg_df):
         '''calculates Reliability score  based on the number of career switches
 
         Args:

@@ -8,3 +8,6 @@ __pycache__
 
 # Files
 cassandra_config.ini
+*.csv
+.vscode/settings.json
+test_*

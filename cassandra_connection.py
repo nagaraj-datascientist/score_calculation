@@ -110,13 +110,15 @@ class CassandraCluster:
 
             self.session = self.cluster.connect()
             self.session.set_keyspace(keyspace)
-            self.logger.info('Cassandra connection is established.')
+            self.logger.info(
+                f'Cassandra connection is established for {keyspace}.')
 
             yield self
         finally:
             if not self.cluster.is_shutdown:
                 self.cluster.shutdown()
-                self.logger.info('Cassandra connection is closed.')
+                self.logger.info(
+                    f'Cassandra connection is closed for {keyspace}.')
 
     @staticmethod
     def query_result_set_to_pandas(session, query):
@@ -143,27 +145,27 @@ class CassandraCluster:
         dataframe = result._current_rows
         return dataframe
 
-    def query_result_set_to_file(self, session, query,
-                                 file_location, file_type='parquet'):
-        '''Writes the result set into a file (Parquet or csv)
+    # def query_result_set_to_file(self, session, query,
+    #                              file_location, file_type='parquet'):
+    #     '''Writes the result set into a file (Parquet or csv)
 
-        Args:
-            session (cassandra session object): Session object for the keyspace
-            query (str): Query to be executed on cassandra server
-            path (str): Folder location for the file to be saved
-            filename (str): Name of the file
-            file_type (str, optional): Extension of file. Defaults to 'parquet'
-        '''
+    #     Args:
+    #         session (cassandra session object): Session object for the keyspace
+    #         query (str): Query to be executed on cassandra server
+    #         path (str): Folder location for the file to be saved
+    #         filename (str): Name of the file
+    #         file_type (str, optional): Extension of file. Defaults to 'parquet'
+    #     '''
 
-        dataframe = self.query_result_set_to_pandas(session, query)
-        if file_type == 'parquet':
-            dataframe.to_parquet(f'{file_location}.parquet', index=False)
-            self.logger.debug(f'File - {file_location}.parquet is saved')
-        elif file_type == 'csv':
-            dataframe.to_csv(f'{file_location}.csv', index=False)
-            self.logger.debug(f'File - {file_location}.csv is saved')
-        else:
-            self.logger.info(f'File type - {file_type} is not allowed')
+    #     dataframe = self.query_result_set_to_pandas(session, query)
+    #     if file_type == 'parquet':
+    #         dataframe.to_parquet(f'{file_location}.parquet', index=False)
+    #         self.logger.debug(f'File - {file_location}.parquet is saved')
+    #     elif file_type == 'csv':
+    #         dataframe.to_csv(f'{file_location}.csv', index=False)
+    #         self.logger.debug(f'File - {file_location}.csv is saved')
+    #     else:
+    #         self.logger.info(f'File type - {file_type} is not allowed')
 
     def __repr__(self):
         return f'''CassandraCluster('{self.ip_address}', {self.port},
